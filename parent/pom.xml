@@ -1343,6 +1343,7 @@
                     <dep>org.apache.maven.surefire:surefire-junit4</dep>
                     <dep>org.apache.maven.surefire:surefire-junit47</dep>
                     <dep>org.apache.maven.surefire:surefire-junit-platform</dep>
+                    <dep>org.junit.jupiter:junit-jupiter-engine</dep>
                   </ignoredUnusedDeclaredDependencies>
                 </configuration>
               </execution>
