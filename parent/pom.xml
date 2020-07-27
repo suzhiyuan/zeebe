@@ -58,9 +58,11 @@
     <version.httpcomponents>4.4.13</version.httpcomponents>
     <version.jackson>2.11.1</version.jackson>
     <version.java-grpc-prometheus>0.3.0</version.java-grpc-prometheus>
-    <version.junit>4.13</version.junit>
+    <version.junit>5.6.2</version.junit>
+    <version.junit4>4.13</version.junit4>
     <version.log4j>2.13.3</version.log4j>
     <version.mockito>3.4.4</version.mockito>
+    <version.mockito-jupiter>2.23.0</version.mockito-jupiter>
     <version.model>7.7.0</version.model>
     <version.msgpack>0.8.20</version.msgpack>
     <version.netty-tcnative>2.0.31.Final</version.netty-tcnative>
@@ -206,10 +208,32 @@
         <version>${version.msgpack}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${version.junit}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${version.junit}</version>
+      </dependency>
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
+        <version>${version.junit4}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${version.junit}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
         <version>${version.junit}</version>
       </dependency>
 
@@ -217,6 +241,13 @@
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>${version.mockito}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${version.mockito-jupiter}</version>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -1066,7 +1097,7 @@
                 </rules>
               </configuration>
             </execution>
-             <execution>
+            <execution>
               <id>enforce-unique-dependencies</id>
               <goals>
                 <goal>enforce</goal>
