@@ -27,8 +27,8 @@ public class RaftStartupMetrics extends RaftMetrics {
           .namespace(NAMESPACE)
           .labelNames(PARTITION_GROUP_NAME_LABEL, PARTITION_LABEL)
           .help(
-              "Time taken to start the partition server (in ms). This includes the bootstrap duration.")
-          .name("partition_server_startup_duration_ms")
+              "Time taken to start the partition server (in ms). This includes the bootstrap time.")
+          .name("partition_server_startup_time")
           .register();
 
   private static final Gauge BOOTSTRAP_DURATION =
@@ -36,7 +36,7 @@ public class RaftStartupMetrics extends RaftMetrics {
           .namespace(NAMESPACE)
           .labelNames(PARTITION_GROUP_NAME_LABEL, PARTITION_LABEL)
           .help("Time taken to bootstrap the partition server (in ms)")
-          .name("partition_server_bootstrap_duration_ms")
+          .name("partition_server_bootstrap_time")
           .register();
 
   public RaftStartupMetrics(final String partitionName) {
