@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 
 /** Pool of Kryo instances, with classes pre-registered. */
 // @ThreadSafe
-public final class NamespaceImpl implements Namespace, KryoFactory, KryoPool {
+public class NamespaceImpl implements Namespace, KryoFactory, KryoPool {
 
   /**
    * Default buffer size used for serialization.
