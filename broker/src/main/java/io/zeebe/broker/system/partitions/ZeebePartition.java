@@ -105,6 +105,7 @@ public final class ZeebePartition extends Actor
   private final RaftPartitionHealth raftPartitionHealth;
   private final ZeebePartitionHealth zeebePartitionHealth;
   private long term;
+  private CompletableActorFuture<Void> closingPartitionFuture;
 
   public ZeebePartition(
       final BrokerInfo localBroker,
@@ -559,12 +560,29 @@ public final class ZeebePartition extends Actor
   }
 
   private CompletableActorFuture<Void> closePartition() {
-    Collections.reverse(closingSteps);
-    final var closeActorsFuture = new CompletableActorFuture<Void>();
-    stepByStepClosing(closeActorsFuture, closingSteps);
+    if (closingPartitionFuture != null) {
+      return closingPartitionFuture;
+    }
 
-    final var closingPartitionFuture = new CompletableActorFuture<Void>();
-    closeActorsFuture.onComplete(closingPartitionFuture);
+    closingPartitionFuture = new CompletableActorFuture<>();
+
+    final var closingStepsInReverseOrder = new ArrayList<>(closingSteps);
+    Collections.reverse(closingStepsInReverseOrder);
+
+    closingSteps.clear();
+
+    final var allStepsClosedFuture = new CompletableActorFuture<Void>();
+    stepByStepClosing(allStepsClosedFuture, closingStepsInReverseOrder);
+
+    allStepsClosedFuture.onComplete(
+        (ok, failure) -> {
+          if (failure == null) {
+            closingPartitionFuture.complete(ok);
+          } else {
+            closingPartitionFuture.completeExceptionally(failure);
+          }
+          closingPartitionFuture = null;
+        });
 
     return closingPartitionFuture;
   }
@@ -690,6 +708,9 @@ public final class ZeebePartition extends Actor
 
   @Override
   protected void onActorClosed() {
+    atomixRaftPartition.removeRoleChangeListener(this);
+    atomixRaftPartition.getServer().removeCommitListener(this);
+
     criticalComponentsHealthMonitor.removeComponent(raftPartitionHealth.getName());
     raftPartitionHealth.close();
   }
@@ -698,22 +719,10 @@ public final class ZeebePartition extends Actor
   public void close() {
     // this is called from outside so it is safe to call join
     final var closeFuture = new CompletableActorFuture<Void>();
-    actor.call(
-        () ->
-            closePartition()
-                .onComplete(
-                    (v, t) -> {
-                      atomixRaftPartition.removeRoleChangeListener(this);
-                      atomixRaftPartition.getServer().removeCommitListener(this);
 
-                      if (t == null) {
-                        closeFuture.complete(null);
-                      } else {
-                        closeFuture.completeExceptionally(t);
-                      }
-                    }));
+    actor.call(() -> closePartition().onComplete(closeFuture));
+
     closeFuture.join();
-
     super.close();
   }
 
